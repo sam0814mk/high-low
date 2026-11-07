@@ -7,7 +7,8 @@ const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&
 let sb, state, busy = false, timer, roomCode = localStorage.getItem('hl_room') || '';
 let selectedTarget = null;
 let lastStateJson = '';
-const formatResult = { HIGH: 'ハイ', LOW: 'ロー', CORRECT: '正解！' };
+const formatResult = { HIGH: 'HIGH', LOW: 'LOW', CORRECT: '正解！' };
+const resultExplanation = { HIGH: '答えは予想した数字より大きい', LOW: '答えは予想した数字より小さい', CORRECT: '数字が一致！ 指名された人は脱落' };
 const phaseText = { lobby:'参加受付', selecting:'数字選択', playing:'対戦中', between:'セット終了', finished:'優勝決定' };
 function notice(message) { $('notice').textContent = message; show('notice', !!message); }
 function errorMessage(error){ return error?.message || String(error); }
@@ -38,7 +39,18 @@ function render(){
  const me=state.players.find(p=>p.id===state.me);const host=state.host_id===state.me;
  const currentId=state.turn_order?.[state.turn_pos-1];
  $('players').innerHTML=state.players.map(p=>`<div class="player ${p.id===state.me?'me':''} ${!p.alive?'dead':''}"><span>${esc(p.name)} ${p.id===state.host_id?'👑':''}</span><span class="tag ${!p.alive?'':'good'}">${!p.alive?'脱落':p.ready?'数字確定':'生存'}</span>${p.id===currentId && state.phase==='playing'?'<span class="tag turn">手番</span>':''}</div>`).join('');
- $('history').innerHTML=(state.history||[]).length?state.history.slice().reverse().map(g=>`<div class="historyitem">SET ${g.set} / ${g.round}周目：${name(g.by)} → ${name(g.target)} ｜${g.number}｜<strong>${formatResult[g.result]}</strong></div>`).join(''):'<p class="foot">まだ予想履歴はありません。</p>';
+ const history=(state.history||[]);
+ const last=history[history.length-1];
+ const showResult=!!last && ['playing','between','finished'].includes(state.phase) && (last.set===state.set_no || state.phase==='finished');
+ show('latestResult',showResult);
+ if(showResult){
+   const result=last.result;
+   $('latestResult').className=`result-panel result-${result.toLowerCase()}`;
+   $('latestGuessContext').innerHTML=`<strong>${name(last.by)}</strong> が <strong>${name(last.target)}</strong> の数字を <span class="result-guess-number">${Number(last.number)}</span> と予想`;
+   $('latestResultWord').textContent=formatResult[result]||result;
+   $('latestResultDescription').textContent=resultExplanation[result]||'';
+ }
+ $('history').innerHTML=history.length?history.slice().reverse().map(g=>`<div class="historyitem"><div class="history-meta">SET ${Number(g.set)} / ${Number(g.round)}周目</div><div class="history-detail"><span>${name(g.by)} → ${name(g.target)} <strong class="history-number">${Number(g.number)}</strong></span><span class="history-result history-${String(g.result).toLowerCase()}">${formatResult[g.result]||esc(g.result)}</span></div></div>`).join(''):'<p class="foot">まだ予想履歴はありません。</p>';
  show('hostPanel',host && ['lobby','selecting','between'].includes(state.phase));
  const hostButton=$('hostAction');
  if(state.phase==='lobby') {hostButton.textContent='参加受付終了・数字選択へ';hostButton.onclick=()=>run(()=>rpc('host_action',{p_code:roomCode,p_action:'select'}));}
