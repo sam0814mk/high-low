@@ -2,23 +2,61 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#131b29" />
-  <title>HIGH & LOW | Number Survival</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0d0c0c" />
+  <title>HIGH &amp; LOW SURVIVAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="shell">
-    <header><div class="brand">HIGH <span>&</span> LOW</div><div class="eyebrow">NUMBER SURVIVAL GAME</div></header>
+    <header class="site-header">
+      <div class="corner-web" aria-hidden="true"></div>
+      <div class="moon-scene" aria-hidden="true"><span class="moon"></span><span class="bat bat-one">◆</span><span class="bat bat-two">◆</span><span class="towers">♜</span></div>
+      <div class="brand" aria-label="HIGH & LOW SURVIVAL">
+        <span class="brand-white">HIGH</span><span class="brand-orange">&amp;</span><span class="brand-white">LOW</span><span class="brand-orange">SURVIVAL</span>
+      </div>
+      <div class="brand-ornament" aria-hidden="true"><i></i><span>🎃</span><i></i></div>
+    </header>
+
     <section id="notice" class="notice hidden" role="alert"></section>
-    <section id="entry" class="panel">
-      <h1>オンライン数字当てサバイバル</h1>
-      <p>名前を入力してルームを作るか、6桁コードで参加しましょう。</p>
-      <label>プレイヤー名 <input id="name" maxlength="20" placeholder="プレイヤー名" autocomplete="nickname" /></label>
-      <label>ルームコード <input id="code" maxlength="6" placeholder="例：A1B2C3" autocapitalize="characters" /></label>
-      <div class="actions"><button id="join">ルームに参加</button><button id="create" class="secondary">新しいルームを作成</button></div>
-      <p class="foot">登録不要・同じ端末の別タブでは同一参加者として扱われます。</p>
+
+    <section id="entry" class="entry-screen">
+      <section class="panel entry-panel" aria-label="ルームへの参加または作成">
+        <div class="eyebrow">// NUMBER GUESSING SURVIVAL</div>
+        <p class="intro">名前を入力してルームを作るか、6桁コードで参加しましょう。</p>
+        <label for="name" class="field-label"><span class="field-icon" aria-hidden="true">♟</span>プレイヤー名
+          <input id="name" maxlength="20" placeholder="プレイヤー名を入力" autocomplete="nickname" />
+        </label>
+        <label for="code" class="field-label"><span class="field-icon" aria-hidden="true">⚿</span>ルームコード <span class="optional-hint">ルーム作成時入力不要</span>
+          <input id="code" maxlength="6" placeholder="例：A1B2C3（参加時のみ入力）" autocapitalize="characters" />
+        </label>
+        <div class="actions entry-actions">
+          <button id="join" type="button">♟ ルームに参加</button>
+          <button id="create" class="secondary" type="button">＋ 新しいルームを作成</button>
+        </div>
+        <p class="foot">ルーム作成時、6桁のコードは自動で発行されます。登録不要・同じ端末の別タブでは同一参加者として扱われます。</p>
+      </section>
+
+      <section id="rules" class="panel rules-panel" aria-labelledby="rulesTitle">
+        <div class="rule-ribbon" id="rulesTitle">GAME RULE</div>
+        <p class="rules-lead">相手の数字を推理し、最後の1人まで生き残れ。</p>
+        <ol class="rules-list">
+          <li>参加人数 × 20 を上限に、秘密の数字を1つ選ぶ。</li>
+          <li>サイコロの出目が大きい順に手番を決める。</li>
+          <li>相手を1人指名し、その人の数字を予想する。</li>
+          <li>相手は「ハイ」「ロー」「正解」で回答する。</li>
+          <li>数字を当てられた人は脱落する。</li>
+          <li>4周終了後、脱落者がいたら次セットの数字上限が半減する。</li>
+        </ol>
+        <div class="rule-dice" aria-hidden="true">⚄<span>⚂</span></div>
+        <div class="win-banner">♛ 最後まで生き残った人が優勝！</div>
+        <p class="rules-sub">数字の重複・再使用はOK。セット終了時に全員が数字を選び直す。最後の1人になった時点で即終了。</p>
+      </section>
     </section>
+
     <section id="game" class="hidden">
       <div class="panel meta">
         <div><span class="tiny">ルーム</span><strong id="roomCode">------</strong></div>
@@ -29,7 +67,7 @@
       <div class="cols">
         <section class="panel">
           <h2>プレイヤー</h2><div id="players"></div>
-          <div id="hostPanel" class="actions hidden"><button id="hostAction">開始</button></div>
+          <div id="hostPanel" class="actions hidden"><button id="hostAction" type="button">開始</button></div>
           <p id="hint" class="foot"></p>
         </section>
         <section class="panel">
@@ -39,9 +77,9 @@
         </section>
       </div>
       <section class="panel"><h2>予想履歴</h2><div id="history"></div></section>
-      <div class="actions"><button id="leave" class="textbutton">端末からルーム表示を終了</button></div>
+      <div class="actions"><button id="leave" class="textbutton" type="button">端末からルーム表示を終了</button></div>
     </section>
-    <footer>HIGH & LOW · GitHub Pages + Supabase</footer>
+    <footer>HIGH &amp; LOW SURVIVAL</footer>
   </main>
   <script src="config.js"></script>
   <script type="module" src="app.js"></script>
