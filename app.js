@@ -38,7 +38,7 @@ function render(){
  $('roomCode').textContent=state.code;$('setNo').textContent=state.set_no;$('range').textContent=`1〜${state.number_max}`;$('phase').textContent=phaseText[state.phase];
  const me=state.players.find(p=>p.id===state.me);const host=state.host_id===state.me;
  const currentId=state.turn_order?.[state.turn_pos-1];
- $('players').innerHTML=state.players.map(p=>`<div class="player ${p.id===state.me?'me':''} ${!p.alive?'dead':''}"><span>${esc(p.name)} ${p.id===state.host_id?'👑':''}</span><span class="tag ${!p.alive?'':'good'}">${!p.alive?'脱落':p.ready?'数字確定':'生存'}</span>${p.id===currentId && state.phase==='playing'?'<span class="tag turn">手番</span>':''}</div>`).join('');
+ $('players').innerHTML=state.players.map(p=>`<div class="player ${p.id===state.me?'me':''} ${!p.alive?'dead':''}"><span>${esc(p.name)} ${p.id===state.host_id?'👑':''}</span><span class="tag ${!p.alive?'':'good'}">${!p.alive?(state.phase==='playing'?'脱落・予想可能':'脱落'):p.ready?'数字確定':'生存'}</span>${p.id===currentId && state.phase==='playing'?'<span class="tag turn">手番</span>':''}</div>`).join('');
  const history=(state.history||[]);
  const last=history[history.length-1];
  const showResult=!!last && ['playing','between','finished'].includes(state.phase) && (last.set===state.set_no || state.phase==='finished');
@@ -76,11 +76,10 @@ function renderAction(me,currentId){
  $('actionTitle').textContent=`${state.round_no} / 4周目`;
  const turnName=name(currentId);
  const rolls=state.turn_order.map(id=>`${name(id)}：🎲${Number(state.dice[id] || 0)}`).join(' ／ ');
- if(!me.alive){content.innerHTML=`<p>あなたは脱落しました。現在の手番：${turnName}</p><p class="dice">サイコロ：${rolls}</p>`;return;}
- if(currentId!==state.me){content.innerHTML=`<p>現在の手番：<strong>${turnName}</strong></p><p>あなたの数字：<span class="emphasis">${state.my_number}</span></p><p class="dice">サイコロ：${rolls}</p>`;return;}
+ if(currentId!==state.me){content.innerHTML=`<p>現在の手番：<strong>${turnName}</strong></p>${!me.alive?'<p class="emphasis">あなたは脱落していますが、このセット中は手番で数字の予想ができます。</p>':`<p>あなたの数字：<span class="emphasis">${state.my_number}</span></p>`}<p class="dice">サイコロ：${rolls}</p>`;return;}
  const options=state.players.filter(p=>p.alive && p.id!==state.me);
  if(!options.some(p=>p.id===selectedTarget))selectedTarget=options[0]?.id;
- content.innerHTML=`<p>あなたの手番です。誰の数字を予想しますか？</p><label>指名相手<select id="target">${options.map(p=>`<option value="${p.id}" ${p.id===selectedTarget?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label><label>予想する数字<input id="guessNumber" type="number" min="1" max="${state.number_max}" value="${Math.ceil(state.number_max/2)}" /></label><p>自分の数字：<strong>${state.my_number}</strong></p><p class="dice">サイコロ：${rolls}</p>`;
+ content.innerHTML=`<p>${me.alive?'あなたの手番です。誰の数字を予想しますか？':'あなたは脱落済みです。このセット中は数字の予想のみ可能です。生存者を指名してください。'}</p><label>指名相手<select id="target">${options.map(p=>`<option value="${p.id}" ${p.id===selectedTarget?'selected':''}>${esc(p.name)}</option>`).join('')}</select></label><label>予想する数字<input id="guessNumber" type="number" min="1" max="${state.number_max}" value="${Math.ceil(state.number_max/2)}" /></label>${me.alive?`<p>自分の数字：<strong>${state.my_number}</strong></p>`:''}<p class="dice">サイコロ：${rolls}</p>`;
  $('target').onchange=e=>{selectedTarget=e.target.value;};
  add('この数字で予想する',()=>run(()=>rpc('guess',{p_code:roomCode,p_target:$('target').value,p_number:Number($('guessNumber').value)})));
 }
