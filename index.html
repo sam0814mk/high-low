@@ -64,6 +64,14 @@
         <div><span class="tiny">数字の範囲</span><strong id="range">-</strong></div>
         <div><span class="tiny">現在の状態</span><strong id="phase">-</strong></div>
       </div>
+      <section id="latestResult" class="result-panel hidden" aria-live="polite" aria-atomic="true">
+        <div class="result-kicker">LATEST ANSWER / 最新の判定</div>
+        <div id="latestGuessContext" class="result-context"></div>
+        <div class="result-main">
+          <div id="latestResultWord" class="result-word"></div>
+          <div id="latestResultDescription" class="result-explanation"></div>
+        </div>
+      </section>
       <div class="cols">
         <section class="panel">
           <h2>プレイヤー</h2><div id="players"></div>
